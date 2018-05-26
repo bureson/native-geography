@@ -8,7 +8,8 @@ export default class App extends React.Component {
     this.state = {
       correct: 0,
       countryList: [],
-      isLoading: true
+      isLoading: true,
+      previous: null
     }
   }
 
@@ -48,16 +49,15 @@ export default class App extends React.Component {
   }
 
   onPressButton = (e, item) => {
-    if (item.item.correct) {
-      this.setState({
-        correct: this.state.correct + 1
-      });
-    }
+    this.setState({
+      correct: item.item.correct ? this.state.correct + 1 : 0,
+      previous: item.item.title
+    });
   }
 
   renderItem = (item) => {
     return (
-      <TouchableOpacity onPress={e => this.onPressButton(e, item)}>
+      <TouchableOpacity onPress={e => this.onPressButton(e, item)} style={styles.list}>
         <View style={styles.option}>
           <Text>{item.item.title}</Text>
         </View>
@@ -78,14 +78,16 @@ export default class App extends React.Component {
     }].concat(this.getRandomOptions(3));
     return (
       <View style={styles.container}>
-        <Text>What is the capital city of</Text>
+        <Text style={styles.text}>What is the capital city of</Text>
         <Text style={styles.titleText}>{country.name}</Text>
         <FlatList
+          style={styles.list}
           data={this.shuffleArray(options)}
           renderItem={item => this.renderItem(item)}
           keyExtractor={(item, index) => String(index)}
         />
-        <Text>Correct answers: {this.state.correct}</Text>
+        {this.state.previous && <Text>Your answer was {this.state.previous}</Text>}
+        <Text>Answer strike {this.state.correct}</Text>
       </View>
     );
   }
@@ -94,16 +96,30 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: Constants.statusBarHeight,
+    paddingTop: '20%',
     backgroundColor: '#ecf0f1',
   },
+  text: {
+    paddingBottom: '10%'
+  },
   titleText: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
+    paddingBottom: '10%'
+  },
+  list: {
+    width: '100%',
+    flex: 0.8
   },
   option: {
+    width: '80%',
+    paddingBottom: '4%',
+    marginTop: '1%',
+    marginLeft: '10%',
+    borderRadius: 5,
     borderWidth: 2,
     borderColor: '#000',
     alignItems: 'center',
